@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Example {
+    // State variable stored on the blockchain
+    uint256 public storedNumber;
+
+    // Function to update the storedNumber using storage
+    function updateStoredNumber(uint256 _newValue) public {
+        storedNumber = _newValue;
+    }
+
+    // Function that uses memory variables
+    function add(uint256 a, uint256 b) public pure returns (uint256) {
+        uint256 result = a + b; // result is stored in memory
+        return result;
+    }
+}
