@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MyContract {
+    uint256 public value;
+
+    function setValue(uint256 _newValue) external {
+        value = _newValue;
+    }
+
+    function getValue() external view returns (uint256) {
+        return value;
+    }
+}
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// Interface for the logic contract
+interface MyContractLogicInterface {
+    function setValue(uint256 _newValue) external;
+    function getValue() external view returns (uint256);
+}
+
+// Proxy contract that forwards calls to the logic contract
+contract MyContractProxy {
+    address public logicContract;
+    address public admin;
+
+    constructor(address _logicContract) {
+        logicContract = _logicContract;
+        admin = msg.sender;
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
+
+    // Forward calls to the logic contract
+    fallback() external payable {
+        address target = logicContract;
+
+        assembly {
+            calldatacopy(0, 0, calldatasize())
+            let result := delegatecall(gas(), target, 0, calldatasize(), 0, 0)
+            returndatacopy(0, 0, returndatasize())
+
+            switch result
+            case 0 {
+                revert(0, returndatasize())
+            }
+            default {
+                return(0, returndatasize())
+            }
+        }
+    }
+
+    // Upgrade the logic contract to a new implementation
+    function upgradeLogicContract(address _newLogicContract) external onlyAdmin {
+        logicContract = _newLogicContract;
+    }
+
+    // Transfer admin rights to another address
+    function transferAdmin(address _newAdmin) external onlyAdmin {
+        admin = _newAdmin;
+    }
+}
