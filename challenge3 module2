@@ -1,0 +1,24 @@
+// Check if MetaMask is installed
+if (window.ethereum) {
+    const ethereum = window.ethereum;
+
+    // Request access to user's MetaMask account
+    ethereum.request({ method: 'eth_requestAccounts' })
+        .then(accounts => {
+            const firstAccount = accounts[0];
+            console.log('Connected to MetaMask with address:', firstAccount);
+            
+            // Now you can interact with the Ethereum blockchain using the `ethereum` object
+            // For example, you can use web3.js or ethers.js to interact with smart contracts
+        })
+        .catch(error => {
+            if (error.code === 4001) {
+                // User rejected request
+                console.log('User rejected account access');
+            } else {
+                console.error('Error connecting to MetaMask:', error);
+            }
+        });
+} else {
+    console.error('MetaMask is not installed');
+}
